@@ -1,0 +1,32 @@
+    source:
+      name: test
+      type: canalKafkaSource
+      config: {
+        "bootstrap.servers" : "127.0.0.1:9092",
+        "topic" : "example",
+        "group.id" : "test",
+        "batchSize" : 1000,
+        "batchTimeout" : 1000
+      }
+    sink:
+      name: test2
+      type: elasticsearchSink
+      config: {
+        "hostNames" : "127.0.0.1:9200",
+        "batchSize" : 100,
+        "protocol" : "http",
+        "esSinkConfig" : [
+            {
+              "database" : "demo",
+              "table" : "demo",
+              "primaryKeyName" : "id",
+              "index" : "demo1"
+            }
+        ]
+      }
+
+    channel:
+      type: memory
+      capacity: 1000000
+
+
