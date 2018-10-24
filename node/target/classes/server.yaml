@@ -20,7 +20,8 @@
               "database" : "demo",
               "table" : "demo",
               "primaryKeyName" : "id",
-              "index" : "demo1"
+              "index" : "demo1",
+              "type" : "demo1"
             }
         ]
       }

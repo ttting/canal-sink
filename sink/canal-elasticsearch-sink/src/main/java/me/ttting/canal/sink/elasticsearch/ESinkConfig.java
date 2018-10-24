@@ -17,5 +17,7 @@ public class ESinkConfig {
 
     private String index;
 
+    private String type;
+
     private Map<String, String> filedMappings;
 }

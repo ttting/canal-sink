@@ -39,7 +39,7 @@ public class DefaultFlatMessageParser implements FlatMessageParser {
     @Override
     public String parseType(FlatMessage flatMessage) {
         ESinkConfig eSinkConfig = eSinkConfigMap.get(configKeyForFlatMessage(flatMessage));
-        return eSinkConfig.getIndex() == null ? flatMessage.getTable() : eSinkConfig.getIndex();
+        return eSinkConfig.getType() == null ? flatMessage.getTable() : eSinkConfig.getType();
     }
 
     @Override

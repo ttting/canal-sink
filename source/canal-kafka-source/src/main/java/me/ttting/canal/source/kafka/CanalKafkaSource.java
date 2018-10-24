@@ -59,8 +59,7 @@ public class CanalKafkaSource extends AbstractPollableSource implements Consumer
             }
 
             if (eventList.size() > 0) {
-                getChannel().batchPut(eventList);
-                eventList.clear();
+                getChannel().batchPut(eventList); eventList.clear();
             }
 
         } catch (Exception e) {

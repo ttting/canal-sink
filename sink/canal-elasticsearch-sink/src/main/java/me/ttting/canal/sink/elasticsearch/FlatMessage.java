@@ -3,6 +3,7 @@ package me.ttting.canal.sink.elasticsearch;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -111,5 +112,12 @@ public class FlatMessage implements Serializable {
 
     public void setOld(List<Map<String, String>> old) {
         this.old = old;
+    }
+
+
+    public static void main(String[] args) {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("test", null);
+        System.out.println(map);
     }
 }

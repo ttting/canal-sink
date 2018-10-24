@@ -12,6 +12,7 @@ import me.ttting.canal.event.Event;
 import me.ttting.canal.sink.AbstractSink;
 import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 
@@ -60,7 +61,6 @@ public class ElasticsearchSink extends AbstractSink implements Configurable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -82,7 +82,8 @@ public class ElasticsearchSink extends AbstractSink implements Configurable {
             }
 
             if (bulkRequest.numberOfActions() > 0) {
-                restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+                BulkResponse bulkResponse =  restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+                System.out.println(bulkResponse);
             } else {
                 return Status.BACKOFF;
             }
