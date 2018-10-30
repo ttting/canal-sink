@@ -1,7 +1,6 @@
 package me.ttting.canal.sink.elasticsearch;
 
 import com.google.common.base.Preconditions;
-import javafx.scene.input.DataFormat;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
