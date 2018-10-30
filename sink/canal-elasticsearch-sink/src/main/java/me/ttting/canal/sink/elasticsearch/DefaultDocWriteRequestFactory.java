@@ -24,7 +24,7 @@ public class DefaultDocWriteRequestFactory implements DocWriteRequestFactory {
     public List<DocWriteRequest> buildWithFlatMessage(FlatMessage flatMessage) {
         FlatMessageType flatMessageType = FlatMessageType.safeValueof(flatMessage.getType());
         if (!flatMessageParser.isConfigured(flatMessage)) {
-            log.info("FlatMessage is not configured, flatMessage :{}", flatMessage.toString());
+//            log.info("FlatMessage is not configured, flatMessage :{}", flatMessage.toString());
             return null;
         }
 

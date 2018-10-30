@@ -62,6 +62,7 @@ public class CanalKafkaSource extends AbstractPollableSource implements Consumer
                 getChannel().batchPut(eventList); eventList.clear();
             }
 
+            kafkaConsumer.commitSync();
         } catch (Exception e) {
             return Status.BACKOFF;
         }
@@ -103,6 +104,7 @@ public class CanalKafkaSource extends AbstractPollableSource implements Consumer
         kafkaProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         kafkaProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         kafkaProps.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        kafkaProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
     }
 
     @Override

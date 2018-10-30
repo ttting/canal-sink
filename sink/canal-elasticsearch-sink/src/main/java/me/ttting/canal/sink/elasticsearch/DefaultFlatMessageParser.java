@@ -1,6 +1,11 @@
 package me.ttting.canal.sink.elasticsearch;
 
 import com.google.common.base.Preconditions;
+import javafx.scene.input.DataFormat;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -10,6 +15,8 @@ import java.util.stream.Collectors;
  */
 public class DefaultFlatMessageParser implements FlatMessageParser {
     private Map<String, ESinkConfig> eSinkConfigMap;
+
+    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     public DefaultFlatMessageParser(List<ESinkConfig> eSinkConfigs) {
         Preconditions.checkNotNull(eSinkConfigs, "esSinkConfig must not be null");
@@ -27,6 +34,9 @@ public class DefaultFlatMessageParser implements FlatMessageParser {
 
     @Override
     public Map<String, String> parseSource(FlatMessage flatMessage, Map<String, String> data) {
+        if (data != null) {
+            data.put("@timestamp", dateFormat.format(new Date()));
+        }
         return data;
     }
 

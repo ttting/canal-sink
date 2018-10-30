@@ -83,7 +83,10 @@ public class ElasticsearchSink extends AbstractSink implements Configurable {
 
             if (bulkRequest.numberOfActions() > 0) {
                 BulkResponse bulkResponse =  restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
-                System.out.println(bulkResponse);
+                if (bulkResponse.hasFailures()) {
+                    log.error("bulk failed with failure message {}", bulkResponse.buildFailureMessage());
+                }
+
             } else {
                 return Status.BACKOFF;
             }
