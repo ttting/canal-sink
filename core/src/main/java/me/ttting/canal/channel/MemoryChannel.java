@@ -41,7 +41,6 @@ public class MemoryChannel implements Channel, Configurable {
 
     @Override
     public void batchPut(List<Event> events) {
-        System.out.println("batch put");
         eventList.addAll(events);
     }
 

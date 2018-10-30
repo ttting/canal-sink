@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="info">
+    <Appenders>
+        <RollingFile name="error" fileName="logs/error.log"
+                     filePattern="logs/error.log.%d{yyyy-MM-dd}.log">
+            <PatternLayout>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}\t%X{logger_id}\t%5p\t%t\t%c{1}:%L - %m%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="warn" fileName="logs/warn.log"
+                     filePattern="logs/warn.log.%d{yyyy-MM-dd}.log">
+            <PatternLayout>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}\t%X{logger_id}\t%5p\t%t\t%c{1}:%L - %m%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <logger name="org.springframework" level="info"/>
+        <logger name="org.apache.kafka" level="info"/>
+
+        <root level="debug" additivity="false" includeLocation="true">
+            <AppenderRef ref="error" level="error"/>
+            <AppenderRef ref="warn" level="debug"/>
+        </root>
+    </Loggers>
+</configuration>
