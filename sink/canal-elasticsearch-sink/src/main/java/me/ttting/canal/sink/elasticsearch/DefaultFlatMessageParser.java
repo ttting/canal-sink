@@ -1,10 +1,13 @@
 package me.ttting.canal.sink.elasticsearch;
 
 import com.google.common.base.Preconditions;
+import org.joda.time.Chronology;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.chrono.ISOChronology;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -15,7 +18,9 @@ import java.util.stream.Collectors;
 public class DefaultFlatMessageParser implements FlatMessageParser {
     private Map<String, ESinkConfig> eSinkConfigMap;
 
-    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    private static final DateTimeFormatter iso8601Formatter = ISODateTimeFormat.dateTime();
+
+    private static final Chronology UTC_CHRONOLOGY = ISOChronology.getInstance(DateTimeZone.UTC);
 
     public DefaultFlatMessageParser(List<ESinkConfig> eSinkConfigs) {
         Preconditions.checkNotNull(eSinkConfigs, "esSinkConfig must not be null");
@@ -34,7 +39,7 @@ public class DefaultFlatMessageParser implements FlatMessageParser {
     @Override
     public Map<String, String> parseSource(FlatMessage flatMessage, Map<String, String> data) {
         if (data != null) {
-            data.put("@timestamp", dateFormat.format(new Date()));
+            data.put("@timestamp", iso8601Formatter.print(new DateTime(UTC_CHRONOLOGY)));
         }
         return data;
     }
