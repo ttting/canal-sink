@@ -34,9 +34,7 @@ public class CanalKafkaSource extends AbstractPollableSource implements Consumer
 
     @Override
     public Status process() {
-        final String batchUUID = UUID.randomUUID().toString();
         byte[] eventBody;
-        String kafkaKey;
         Event event;
 
         final long batchStartTime = System.currentTimeMillis();
