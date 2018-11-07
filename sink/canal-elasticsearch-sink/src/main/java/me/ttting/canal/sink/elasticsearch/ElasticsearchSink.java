@@ -41,6 +41,8 @@ public class ElasticsearchSink extends AbstractSink implements Configurable {
 
     private String protocol;
 
+    private BulkRequest bulkRequest;
+
     @Override
     public void configure(Properties properties) {
         try {
@@ -55,7 +57,8 @@ public class ElasticsearchSink extends AbstractSink implements Configurable {
             Preconditions.checkNotNull(hostNames, "hostNames");
             Preconditions.checkNotNull(protocol, "protocol");
 
-            List<ESinkConfig> esSinkConfigs = objectMapper.readValue(objectMapper.writeValueAsString(config.get("esSinkConfig")), new TypeReference<List<ESinkConfig>>() {});
+            List<ESinkConfig> esSinkConfigs = objectMapper.readValue(objectMapper.writeValueAsString(config.get("esSinkConfig")), new TypeReference<List<ESinkConfig>>() {
+            });
             docWriteRequestFactory = new DefaultDocWriteRequestFactory(new DefaultFlatMessageParser(esSinkConfigs));
             restHighLevelClient = ResetHighLevelClientFactory.createClient(hostNames, protocol);
         } catch (IOException e) {
@@ -68,32 +71,42 @@ public class ElasticsearchSink extends AbstractSink implements Configurable {
         try {
             int count;
             Channel channel = getChannel();
-            BulkRequest bulkRequest = new BulkRequest();
+            if (bulkRequest == null) {
+                bulkRequest = new BulkRequest();
+            }
 
-            for (count = 0; count < batchSize; count++) {
-                Event event = channel.take();
-                if (event == null)
-                    break;
-                FlatMessage flatMessage = objectMapper.readValue(event.getBody(), FlatMessage.class);
-                List<DocWriteRequest> docWriteRequests = docWriteRequestFactory.buildWithFlatMessage(flatMessage);
-                if (docWriteRequests != null && docWriteRequests.size() > 0) {
-                    bulkRequest.add(docWriteRequests);
+            //retry by pre bulkRequest
+            if (bulkRequest.numberOfActions() == 0) {
+                for (count = 0; count < batchSize; count++) {
+                    Event event = channel.take();
+                    if (event == null)
+                        break;
+                    FlatMessage flatMessage = objectMapper.readValue(event.getBody(), FlatMessage.class);
+                    List<DocWriteRequest> docWriteRequests = docWriteRequestFactory.buildWithFlatMessage(flatMessage);
+                    if (docWriteRequests != null && docWriteRequests.size() > 0) {
+                        bulkRequest.add(docWriteRequests);
+                    }
                 }
             }
 
             if (bulkRequest.numberOfActions() > 0) {
-                BulkResponse bulkResponse =  restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+                BulkResponse bulkResponse = restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
                 if (bulkResponse.hasFailures()) {
                     log.error("bulk failed with failure message {}", bulkResponse.buildFailureMessage());
                 }
-
+                bulkRequest = null;
             } else {
+                bulkRequest = null;
                 return Status.BACKOFF;
             }
+        } catch (IOException e) {
+            log.error("IOException {}", e);
         } catch (Exception e) {
             log.error("exception ", e);
+            bulkRequest = null;
             return Status.BACKOFF;
         }
+
         return Status.READY;
     }
 }

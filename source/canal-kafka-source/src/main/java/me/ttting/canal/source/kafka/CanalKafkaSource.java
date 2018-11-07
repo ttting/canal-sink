@@ -62,7 +62,7 @@ public class CanalKafkaSource extends AbstractPollableSource implements Consumer
                 getChannel().batchPut(eventList); eventList.clear();
             }
 
-            kafkaConsumer.commitSync();
+            kafkaConsumer.commitAsync();
         } catch (Exception e) {
             return Status.BACKOFF;
         }

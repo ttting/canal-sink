@@ -35,7 +35,7 @@ public class Application implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        String conf = System.getProperty("server.yaml", "classpath:server.yaml");
+        String conf = System.getProperty("canal-sink.conf", "classpath:canal-sink.yaml");
         Preconditions.checkNotNull(conf, "conf must not be null");
 
         yamlFileConfigurationProvider = new YamlFileConfigurationProvider(conf);

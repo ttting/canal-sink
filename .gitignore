@@ -25,3 +25,10 @@
 hs_err_pid*
 
 .idea/
+/sink/canal-elasticsearch-sink/target/
+**/target
+**/.settings/
+.vscode
+**/.classpath
+**/.project
+**/.factorypath

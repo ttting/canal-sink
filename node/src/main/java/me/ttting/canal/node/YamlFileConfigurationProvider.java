@@ -130,7 +130,7 @@ public class YamlFileConfigurationProvider implements ConfigurationProvider {
     }
 
     public static void main(String[] args) {
-        YamlFileConfigurationProvider yamlFileConfigurationProvider = new YamlFileConfigurationProvider("classpath:server.yaml");
+        YamlFileConfigurationProvider yamlFileConfigurationProvider = new YamlFileConfigurationProvider("classpath:canal-sink.yaml");
         yamlFileConfigurationProvider.load();
     }
 }

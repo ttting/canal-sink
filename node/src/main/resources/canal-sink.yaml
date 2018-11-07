@@ -4,7 +4,7 @@
       config: {
         "bootstrap.servers" : "172.30.9.99:9092,172.30.9.98:9092,172.30.9.102:9092",
         "topic" : "mysql.crm_test",
-        "group.id" : "test2",
+        "group.id" : "test3",
         "batchSize" : 1000,
         "batchTimeout" : 1000
       }
