@@ -68,7 +68,7 @@ public class PollableSourceRunner extends SourceRunner {
         public void run() {
             log.debug("Polling runner starting. Source:{}", source);
             while (!shouldStop.get()) {
-                if (source.process() != PollableSource.Status.BACKOFF) {
+                if (source.process() == PollableSource.Status.BACKOFF) {
                     try {
                         Thread.sleep(100L);
                     } catch (InterruptedException e) {
