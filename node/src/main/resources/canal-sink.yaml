@@ -3,8 +3,8 @@
       type: canalKafkaSource
       config: {
         "bootstrap.servers" : "172.30.9.99:9092,172.30.9.98:9092,172.30.9.102:9092",
-        "topic" : "mysql.crm_test",
-        "group.id" : "test4",
+        "topic" : "mysql.crm_dev",
+        "group.id" : "canal-sink-local-test-1",
         "batchSize" : 1000,
         "batchTimeout" : 10000
       }
@@ -13,14 +13,14 @@
       type: elasticsearchSink
       config: {
         "hostNames" : "172.30.9.152:9200","172.30.9.153:9200","172.30.9.154:9200","172.30.9.155:9200",
-        "batchSize" : 10000,
+        "batchSize" : 100,
         "protocol" : "http",
         "esSinkConfig" : [
             {
-              "database" : "crm_test",
-              "table" : "BIZ",
+              "database" : "crm",
+              "table" : "biz",
               "primaryKeyName" : "ID",
-              "index" : "crm_test.biz1",
+              "index" : "canal-sink-local-test",
               "type" : "doc"
             }
         ]

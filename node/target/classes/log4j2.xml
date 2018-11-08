@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration status="info">
     <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout
+                    pattern="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+        </Console>
         <RollingFile name="error" fileName="logs/error.log"
                      filePattern="logs/error.log.%d{yyyy-MM-dd}.log">
             <PatternLayout>
@@ -25,6 +29,7 @@
         <logger name="org.apache.kafka" level="info"/>
 
         <root level="debug" additivity="false" includeLocation="true">
+            <AppenderRef ref="console" level="debug"/>
             <AppenderRef ref="error" level="error"/>
             <AppenderRef ref="warn" level="debug"/>
         </root>

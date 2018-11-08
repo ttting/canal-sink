@@ -10,6 +10,7 @@ import me.ttting.canal.Channel;
 import me.ttting.canal.conf.Configurable;
 import me.ttting.canal.event.Event;
 import me.ttting.canal.sink.AbstractSink;
+import me.ttting.canal.sink.SinkConstants;
 import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -29,10 +30,6 @@ public class ElasticsearchSink extends AbstractSink implements Configurable {
 
     private ObjectMapper objectMapper;
 
-    private static final int defaultBatchSize = 5;
-
-    private int batchSize = defaultBatchSize;
-
     private DocWriteRequestFactory docWriteRequestFactory;
 
     private RestHighLevelClient restHighLevelClient;
@@ -43,6 +40,14 @@ public class ElasticsearchSink extends AbstractSink implements Configurable {
 
     private BulkRequest bulkRequest;
 
+    private final static int DEFAULT_MAX_BATCH_DURATION_MILLS = 500;
+
+    private int maxBatchDurationMills;
+
+    private final static int DEFAULT_BATCH_SIZE = 100;
+
+    private int batchSize;
+
     @Override
     public void configure(Properties properties) {
         try {
@@ -51,14 +56,18 @@ public class ElasticsearchSink extends AbstractSink implements Configurable {
 
             Map<String, Object> config = (Map<String, Object>) properties.get("config");
 
+            Preconditions.checkNotNull(config, "config");
+
             hostNames = (String) config.get(ElasticSearchSinkConstants.HOSTNAMES);
             protocol = (String) config.get(ElasticSearchSinkConstants.protocol);
 
             Preconditions.checkNotNull(hostNames, "hostNames");
             Preconditions.checkNotNull(protocol, "protocol");
 
-            List<ESinkConfig> esSinkConfigs = objectMapper.readValue(objectMapper.writeValueAsString(config.get("esSinkConfig")), new TypeReference<List<ESinkConfig>>() {
-            });
+            maxBatchDurationMills = (int) config.getOrDefault(SinkConstants.BATCH_TIMEOUT, DEFAULT_MAX_BATCH_DURATION_MILLS);
+            batchSize = (int) config.getOrDefault(SinkConstants.BATCH_SIZE, DEFAULT_BATCH_SIZE);
+
+            List<ESinkConfig> esSinkConfigs = objectMapper.readValue(objectMapper.writeValueAsString(config.get("esSinkConfig")), new TypeReference<List<ESinkConfig>>() {});
             docWriteRequestFactory = new DefaultDocWriteRequestFactory(new DefaultFlatMessageParser(esSinkConfigs));
             restHighLevelClient = ResetHighLevelClientFactory.createClient(hostNames, protocol);
         } catch (IOException e) {
@@ -75,9 +84,12 @@ public class ElasticsearchSink extends AbstractSink implements Configurable {
                 bulkRequest = new BulkRequest();
             }
 
+            final long batchStartTime = System.currentTimeMillis();
+            final long maxBatchEndTIme = batchStartTime + maxBatchDurationMills;
+
             //retry by pre bulkRequest
             if (bulkRequest.numberOfActions() == 0) {
-                for (count = 0; count < batchSize; count++) {
+                for (count = 0; count < batchSize && System.currentTimeMillis() < maxBatchEndTIme; count++) {
                     Event event = channel.take();
                     if (event == null)
                         break;
