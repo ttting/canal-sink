@@ -1,15 +1,18 @@
 package me.ttting.canal.sink;
 
+import lombok.extern.slf4j.Slf4j;
 import me.ttting.canal.Sink;
 import me.ttting.canal.SinkRunner;
 import me.ttting.canal.lifecycle.LifecycleAware;
 import me.ttting.canal.lifecycle.LifecycleState;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by jiangtiteng on 2018/10/17
  */
+@Slf4j
 public class PollableSinkRunner extends SinkRunner implements LifecycleAware {
 
     private Thread runnerThread;
@@ -17,6 +20,7 @@ public class PollableSinkRunner extends SinkRunner implements LifecycleAware {
     private PollingRunner runner;
 
     private LifecycleState lifecycleState;
+
 
     @Override
     public void start() {
@@ -56,17 +60,21 @@ public class PollableSinkRunner extends SinkRunner implements LifecycleAware {
 
         private Sink sink;
 
+        private AtomicInteger backOffCount = new AtomicInteger(0);
+
         @Override
         public void run() {
             while (!shouldStop.get()) {
                 if (sink.process().equals(Sink.Status.BACKOFF)) {
                     try {
+                        backOffCount.addAndGet(1);
                         Thread.sleep(100L);
+                        if (backOffCount.get() % 100 == 0)
+                            log.info("Sink Runner backoff count {}", backOffCount.get());
+
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                } else {
-                    //todo 计数
                 }
             }
         }

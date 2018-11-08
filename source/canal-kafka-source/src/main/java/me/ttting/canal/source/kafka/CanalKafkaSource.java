@@ -1,6 +1,7 @@
 package me.ttting.canal.source.kafka;
 
 import com.google.common.base.Preconditions;
+import lombok.extern.slf4j.Slf4j;
 import me.ttting.canal.event.Event;
 import me.ttting.canal.event.EventBuilder;
 import me.ttting.canal.source.AbstractPollableSource;
@@ -12,6 +13,7 @@ import java.util.*;
 /**
  * Created by jiangtiteng on 2018/10/9
  */
+@Slf4j
 public class CanalKafkaSource extends AbstractPollableSource implements ConsumerRebalanceListener, me.ttting.canal.conf.Configurable {
 
     private final List<Event> eventList = new ArrayList<>();
@@ -58,10 +60,12 @@ public class CanalKafkaSource extends AbstractPollableSource implements Consumer
 
             if (eventList.size() > 0) {
                 getChannel().batchPut(eventList); eventList.clear();
+                kafkaConsumer.commitAsync();
+            } else {
+               return Status.BACKOFF;
             }
-
-            kafkaConsumer.commitAsync();
         } catch (Exception e) {
+            log.info("e {}", e);
             return Status.BACKOFF;
         }
 

@@ -6,6 +6,7 @@ import me.ttting.canal.SourceRunner;
 import me.ttting.canal.lifecycle.LifecycleState;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by jiangtiteng on 2018/10/9
@@ -64,18 +65,22 @@ public class PollableSourceRunner extends SourceRunner {
 
         private PollableSource source;
 
+        private AtomicInteger backOffCount = new AtomicInteger(0);
+
         @Override
         public void run() {
             log.debug("Polling runner starting. Source:{}", source);
             while (!shouldStop.get()) {
                 if (source.process() == PollableSource.Status.BACKOFF) {
                     try {
+                        backOffCount.addAndGet(1);
+                        if (backOffCount.get() % 100 == 0) {
+                           log.info("Polling Source Runner backoff count {}", backOffCount.get());
+                        }
                         Thread.sleep(100L);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                } else {
-                    //todo
                 }
             }
         }
